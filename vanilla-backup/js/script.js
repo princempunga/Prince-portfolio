@@ -156,3 +156,94 @@ window.addEventListener("resize", () => {
         mainContent.style.transform = "";
     }
 });
+
+/* ============================== Lightbox Portfolio ============================ */
+const lightbox = document.getElementById("portfolio-lightbox"),
+      lightboxImg = lightbox.querySelector(".lightbox-img"),
+      lightboxTitle = lightbox.querySelector(".lightbox-title"),
+      lightboxClose = lightbox.querySelector(".lightbox-close"),
+      portfolioItems = document.querySelectorAll(".portfolio-item-inner");
+
+if (lightbox) {
+    portfolioItems.forEach(item => {
+        const img = item.querySelector(".portfolio-img img");
+        if (img) {
+            item.addEventListener("click", () => {
+                lightboxImg.src = img.src;
+                lightboxTitle.innerText = img.getAttribute("alt");
+                lightbox.classList.add("open");
+            });
+        }
+    });
+
+    lightboxClose.addEventListener("click", () => {
+        lightbox.classList.remove("open");
+    });
+
+    lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox || e.target.classList.contains("lightbox-content")) {
+            lightbox.classList.remove("open");
+        }
+    });
+}
+
+/* ============================== Contact Form AJAX ============================ */
+const contactForm = document.getElementById("contact-form");
+const formMessage = document.getElementById("form-message");
+const submitBtn = document.getElementById("submit-btn");
+
+if (contactForm) {
+    contactForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        // Basic validation check
+        if (!contactForm.checkValidity()) {
+            contactForm.reportValidity();
+            return;
+        }
+
+        // Change button state
+        const originalBtnText = submitBtn.innerText;
+        submitBtn.innerText = "Sending...";
+        submitBtn.disabled = true;
+
+        // Use EmailJS to send the form
+        // TODO: Replace 'YOUR_SERVICE_ID' and 'YOUR_TEMPLATE_ID' with your actual EmailJS IDs
+        emailjs.sendForm('service_djzm1da', 'template_0d41jqz', this)
+        .then(() => {
+            // Restore button state
+            submitBtn.innerText = originalBtnText;
+            submitBtn.disabled = false;
+
+            // Show message
+            formMessage.style.display = "block";
+            formMessage.innerText = "Thank you! Your message has been sent successfully.";
+            formMessage.className = "success-msg";
+            contactForm.reset();
+
+            // Hide message after 5 seconds
+            setTimeout(() => {
+                formMessage.style.display = "none";
+                formMessage.className = "";
+                formMessage.innerText = "";
+            }, 5000);
+        }, (error) => {
+            console.error('FAILED...', error);
+            // Restore button state
+            submitBtn.innerText = originalBtnText;
+            submitBtn.disabled = false;
+
+            // Show generic error
+            formMessage.style.display = "block";
+            formMessage.className = "error-msg";
+            formMessage.innerText = "Oops! An error occurred. Please check your EmailJS configuration.";
+
+            // Hide message after 5 seconds
+            setTimeout(() => {
+                formMessage.style.display = "none";
+                formMessage.className = "";
+                formMessage.innerText = "";
+            }, 5000);
+        });
+    });
+}
