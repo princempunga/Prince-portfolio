@@ -22,6 +22,29 @@ function App() {
     emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
   }, []);
 
+  // ----- Scroll Reveal Observer -----
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          // observer.unobserve(entry.target); // Optional: if we only want it to animate once
+        }
+      });
+    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+    // We wait briefly to ensure all components are fully painted
+    const timer = setTimeout(() => {
+      const elements = document.querySelectorAll('.animate-fade, .animate-card');
+      elements.forEach(el => observer.observe(el));
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, []);
+
   // ----- Mobile: highlight nav on scroll -----
   useEffect(() => {
     const handleScroll = () => {
